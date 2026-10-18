@@ -12,19 +12,19 @@ ticket, and handing a finding back. MIT licensed.
 Repo-local (tracked copy under `.agents/skills/replypen-core` plus `skills-lock.json`):
 
 ```sh
-pnpm dlx skills add rootcause-org/replypen-skills -s replypen-core -y
+pnpm dlx skills add replypen/replypen-skills -s replypen-core -y
 ```
 
 Then add a thin project wrapper skill `replypen` next to it that owns your local config: project
 and tenant names, ticket list ids, who owns the brain, which writes are allowed. The core is
 replaced on update, so nothing project-specific lives in it.
 
-The `rc` CLI: `brew install rootcause-org/tap/rc` (macOS) or see
-[rootcause-cli](https://github.com/rootcause-org/rootcause-cli#install).
+The `rp` CLI (`rc` is an alias): `brew install --cask replypen/tap/rp` (macOS) or see
+[replypen-cli](https://github.com/replypen/replypen-cli#install).
 
 | Skill | Use when |
 | --- | --- |
 | [replypen-core](skills/replypen-core/SKILL.md) | you got a run link / escalation ticket, need a narrow production read, or must route a finding |
 
 Brain authoring (the agent's own knowledge repo) is documented in
-[rootcause-brain-skills](https://github.com/rootcause-org/rootcause-brain-skills).
+[replypen-brain-skills](https://github.com/replypen/replypen-brain-skills).

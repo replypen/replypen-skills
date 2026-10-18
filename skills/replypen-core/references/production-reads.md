@@ -12,15 +12,15 @@ For when the trace shows what the agent saw, but you need a fact it didn't fetch
 
 ## Not a read
 
-- `rc ask "<question>"` **creates a production run**: it costs, is journaled, and under the project's
+- `rp ask "<question>"` **creates a production run**: it costs, is journaled, and under the project's
   configured gates it can place output or execute actions. Use it only to reproduce agent behaviour,
   and prefer `--simulation` (nothing placed, no action, no journal; it still reads real production
-  data) when the wrapper allows `rc ask` at all.
-- `rc run retry` re-runs a run. Same caution.
+  data) when the wrapper allows `rp ask` at all.
+- `rp run retry` re-runs a run. Same caution.
 
 ## Never
 
 - Ad-hoc production writes (SQL, consoles, scripts). Writes go through the project's action or
   policy path per the wrapper, with the required human approval.
 - Pasting secrets, DSNs, tokens or share URLs into prompts, tickets, logs or commits.
-- Committing `.rootcause/` output; it contains customer data.
+- Committing `.replypen/` output; it contains customer data.

@@ -18,5 +18,5 @@ A ticket can be two classes (e.g. a product bug the agent also explained wrongly
   The brain holds what recurs.
 - Keep the closing comment terse: cause, evidence (step `#` or query), fix or reason.
 - Brain authoring itself (layout, scripts, publishing) is documented in
-  [rootcause-brain-skills](https://github.com/rootcause-org/rootcause-brain-skills): see
+  [replypen-brain-skills](https://github.com/replypen/replypen-brain-skills): see
   `docs/brain-model.md` and the `local-brain-work` / `brain-publish` skills. Don't duplicate it.
