@@ -34,7 +34,9 @@ Stop as soon as you know enough.
 1. **Overview.** Open the link in a browser, or:
    `rp run debug '<full run URL>'` (quote it; the `?` and `&` matter to the shell). No login and
    no project membership needed. Writes `.replypen/debug/<run8>-<project>.md` (index) and
-   `.jsonl` (event log).
+   `.jsonl` (event log). Only a short id (`#96745381`, as DentAI Mailfeedback shows)? Any
+   `rp --project <p> run show|trace|debug '#96745381'` resolves a unique ≥8-hex prefix in that
+   project (ambiguous → 409 `AMBIGUOUS_RUN`: add characters).
 2. **Read the index.** Question, outcome, timeline, flags (failures, blocked egress, repeats,
    large output), files the run read, and a *Drill down* block with ready-made jq recipes.
 3. **Drill steps that matter.** Start with selected events; expand only when needed. Line 1 is the run header; each
