@@ -12,6 +12,11 @@ URL that does not exist, an internal link into nowhere, a section that silently 
 Stdlib only (urllib + html.parser), so it runs in the workspace container as-is. Every network call
 goes through the run's egress; a blocked host reads as a failed check, not as a crash.
 Exit code 1 as soon as one check fails.
+
+Two copies, kept byte-identical: ReplyPen's host skill `skills/website/scripts/check_page.py` (repo
+replypen/replypen, mounted at /skills for the chat agent) and `skills/website-dev/scripts/check_page.py`
+(public repo replypen/replypen-skills, vendored into site repos for coding agents). Change one, copy it to
+the other and `cmp` them.
 """
 
 from __future__ import annotations

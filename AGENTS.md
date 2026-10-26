@@ -19,5 +19,6 @@ Rules:
 - `skills/website-dev/scripts/check_page.py` is a byte-identical copy of ReplyPen's host-side
   `skills/website/scripts/check_page.py` (what the chat agent runs): change it there first, then
   copy; `cmp` the two before committing.
+  `website-dev` §Rules mirrors that host skill's `SKILL.md` §Rules: change one, align the other.
 
 Commit logical changes to `main`.

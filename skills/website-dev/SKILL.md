@@ -50,6 +50,8 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 
 ## Rules (the same ones the ReplyPen chat agent follows)
 
+<!-- Mirrors the Rules of ReplyPen's chat skill `skills/website/SKILL.md` (repo replypen/replypen): change one, align the other. -->
+
 - **Never invent facts:** hours, prices, names, phone numbers, quotes, figures. Missing value: ask.
 - Copy is the customer's: keep its language, tone and wording; no new marketing claims.
 - Facts live in `_data/site.yml` (or what AGENTS.md names), never hardcoded in a page.
