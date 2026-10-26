@@ -13,6 +13,12 @@ description: >-
 site exceptions (other build steps, a separate production config). Where it differs from this file,
 it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you can and must.
 
+> [!IMPORTANT]
+> **`main` is the live website.** Never commit a visitor-visible change on `main` or push it there,
+> whatever a global "push to main / no feature branches" habit says: branch → pull request → preview
+> → the site owner's OK on that preview → merge. Only tooling with a byte-identical `_site` (step 8)
+> may go straight to `main`.
+
 ## The loop
 
 1. **Fresh start:** `git pull --no-rebase`, then a branch: `git switch -c <name>`. The name becomes the
@@ -38,8 +44,9 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
    `gh pr checks --watch` until **Workers Builds: <worker>** passes (`name` in `wrangler.jsonc`).
    Preview URL: `https://<branch>-<worker>.rootcause-sites.workers.dev` unless AGENTS.md says otherwise.
    Run `check_page.py` on the preview pages too.
-10. **Live = merge to `main`.** Merge a visitor-visible change only when the site owner approved that
-    change after seeing the preview; a green build is not approval. Report the preview URL instead.
+10. **Stop at the preview.** Report the preview URL and ask. Merge (`gh pr merge --squash
+    --delete-branch`) only after the site owner's OK on that preview (a green build is not approval),
+    then confirm the change on the live URL.
 
 ## Rules (the same ones the ReplyPen chat agent follows)
 
