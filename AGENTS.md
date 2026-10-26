@@ -16,4 +16,8 @@ Rules:
 - Install check: `pnpm dlx skills add replypen/replypen-skills -s replypen-core -y` in a scratch
   dir yields `.agents/skills/replypen-core/` and a `skills-lock.json` entry.
 
+- `skills/website-dev/scripts/check_page.py` is a byte-identical copy of ReplyPen's host-side
+  `skills/website/scripts/check_page.py` (what the chat agent runs): change it there first, then
+  copy; `cmp` the two before committing.
+
 Commit logical changes to `main`.

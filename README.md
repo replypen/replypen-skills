@@ -25,6 +25,7 @@ The `rp` CLI (`rc` is an alias): `brew install --cask replypen/tap/rp` (macOS) o
 | Skill | Use when |
 | --- | --- |
 | [replypen-core](skills/replypen-core/SKILL.md) | you got a run link / escalation ticket, need a narrow production read, or must route a finding |
+| [website-dev](skills/website-dev/SKILL.md) | you change a ReplyPen-edited website repo: local build, look, link check, branch preview |
 
 Brain authoring (the agent's own knowledge repo) is documented in
 [replypen-brain-skills](https://github.com/replypen/replypen-brain-skills).
