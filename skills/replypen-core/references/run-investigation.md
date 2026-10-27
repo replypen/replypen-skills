@@ -34,7 +34,7 @@ Stop as soon as you know enough.
 1. **Overview.** Open the link in a browser, or:
    `rp run debug '<full run URL>'` (quote it; the `?` and `&` matter to the shell). No login and
    no project membership needed. Writes `.replypen/debug/<run8>-<project>.md` (index) and
-   `.jsonl` (event log). Only a short id (`#96745381`, as DentAI Mailfeedback shows)? Any
+   `.jsonl` (event log). Only a short id (`#96745381`, as a feedback inbox or dashboard may show)? Any
    `rp --project <p> run show|trace|debug '#96745381'` resolves a unique ≥8-hex prefix in that
    project (ambiguous → 409 `AMBIGUOUS_RUN`: add characters).
 2. **Read the index.** Question, outcome, timeline, flags (failures, blocked egress, repeats,
