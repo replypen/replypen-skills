@@ -2,7 +2,7 @@
 name: website-dev
 description: >-
   Coding-agent workflow for a public website repo that ReplyPen chat also edits (Eleventy or Jekyll,
-  Cloudflare Workers static assets + Workers Builds, root AGENTS.md with the site map). Use for ANY
+  Cloudflare Workers static assets deployed by .github/workflows/deploy.yml, root AGENTS.md with the site map). Use for ANY
   change in such a repo: run it locally, build, look at the changed pages on phone and desktop width,
   check links/images, push a branch preview, wait for the deploy check. Not for provisioning a new site.
 ---
@@ -26,8 +26,8 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 2. **Tools:** Node comes from `mise.toml` (`mise install`). No `pnpm` on PATH? Prefix every command with
    `mise exec pnpm@10 --` (e.g. `mise exec pnpm@10 -- bash build.sh`). Then `pnpm install`.
 3. **Edit** the smallest change that does the ask.
-4. **Build = the CI gate:** `bash build.sh`, the exact command Workers Builds runs (site tests and
-   contract checks run inside it). It must pass before you push.
+4. **Build = the CI gate:** `bash build.sh`, the exact command the `Website build` job runs (site tests
+   and contract checks run inside it). It must pass before you push.
 5. **Serve like Cloudflare:** `pnpm dlx wrangler@4 dev --port 8787` serves `_site` with the real
    redirects, headers (CSP) and trailing-slash handling (use the `--config` AGENTS.md names, if any).
    It serves the last build: rebuild after every edit. `pnpm serve` (live reload, :8080) is for quick
@@ -41,7 +41,8 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 8. **Tooling-only change** (AGENTS.md, skills, scripts, CI): prove the site did not change. Build
    before and after, `diff -r` the two `_site` copies: identical, or explain every difference.
 9. **Preview:** commit, `git push -u origin <branch>`, `gh pr create --fill`, then
-   `gh pr checks --watch` until **Workers Builds: <worker>** passes (`name` in `wrangler.jsonc`).
+   `gh pr checks --watch` until **Website deploy** passes (the workflow's deploy job; `name` in
+   `wrangler.jsonc` is the worker).
    Preview URL: `https://<branch>-<worker>.rootcause-sites.workers.dev` unless AGENTS.md says otherwise.
    Run `check_page.py` on the preview pages too.
 10. **Stop at the preview.** Report the preview URL and ask. Merge (`gh pr merge --squash
