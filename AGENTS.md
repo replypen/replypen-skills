@@ -10,7 +10,8 @@ Rules:
 - `rp <cmd> --help` is command truth. Verify every command you write against it; keep examples
   few and link `--help` instead of copying flag lists.
 - Never put a real share token, run URL with `?t=`, customer data or secret in an example.
-- `SKILL.md` ≤ 80 lines, README ≤ 40; terse, no marketing.
+- `SKILL.md` ≤ 80 lines, README ≤ 40; terse, no marketing. Keep its line under the H1 naming this repo
+  as the only place to edit it: consumers commit copies that every refresh overwrites.
 - Link check before committing: every relative Markdown link resolves, external links open:
   `for f in $(git ls-files '*.md'); do grep -oE '\]\([^)#]+' "$f" | cut -c3- | grep -v '://' | while read -r l; do [ -e "$(dirname "$f")/$l" ] || echo "BROKEN $f -> $l"; done; done`
 - Install check: `pnpm dlx skills add replypen/replypen-skills -s replypen-core -y` in a scratch

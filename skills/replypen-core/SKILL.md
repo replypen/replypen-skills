@@ -10,6 +10,8 @@ description: >-
 
 # replypen-core
 
+Edit in [replypen/replypen-skills](https://github.com/replypen/replypen-skills) only: installed copies are overwritten on update.
+
 ## Audience
 
 A developer (or their coding agent) working in their OWN product repository who must understand

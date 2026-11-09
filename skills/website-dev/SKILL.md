@@ -9,6 +9,8 @@ description: >-
 
 # website-dev
 
+Edit in [replypen/replypen-skills](https://github.com/replypen/replypen-skills) only: installed copies are overwritten on update.
+
 **The site's root `AGENTS.md` comes first**: where things live, recipes, URL style, form contract and
 site exceptions (other build steps, a separate production config). Where it differs from this file,
 it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you can and must.
