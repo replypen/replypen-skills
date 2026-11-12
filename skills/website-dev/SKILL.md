@@ -45,8 +45,7 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 9. **Preview:** commit, `git push -u origin <branch>`, `gh pr create --fill`, then
    `gh pr checks --watch` until **Website deploy** passes (the workflow's deploy job; `name` in
    `wrangler.jsonc` is the worker).
-   Preview URL: `https://<branch>-<worker>.rootcause-sites.workers.dev` unless AGENTS.md says otherwise.
-   Run `check_page.py` on the preview pages too.
+   Preview URL: printed in the deploy job's log (`https://<branch>-<worker>.<subdomain>.workers.dev`). Check it too.
 10. **Stop at the preview.** Report the preview URL and ask. Merge (`gh pr merge --squash
     --delete-branch`) only after the site owner's OK on that preview (a green build is not approval),
     then confirm the change on the live URL.
@@ -56,6 +55,7 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 <!-- Mirrors the Rules of ReplyPen's chat skill `skills/website/SKILL.md` (repo replypen/replypen): change one, align the other. -->
 
 - **Never invent facts:** hours, prices, names, phone numbers, quotes, figures. Missing value: ask.
+- Search + AI answers on every page you build or touch (all of it on a new site): [references/seo-geo.md](references/seo-geo.md).
 - Copy is the customer's: keep its language, tone and wording; no new marketing claims.
 - Facts live in `_data/site.yml` (or what AGENTS.md names), never hardcoded in a page.
 - Minimal diffs: reuse existing classes, no inline styles or scripts (the CSP blocks them), no
