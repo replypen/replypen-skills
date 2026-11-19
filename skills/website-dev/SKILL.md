@@ -39,7 +39,7 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
    A `_data/` or `_includes/` edit shows on many pages: look at two of them.
 7. **Check it:** `python3 .agents/skills/website-dev/scripts/check_page.py http://localhost:8787/<page> …`
    (same checker the ReplyPen chat agent runs on its preview: HTTP 200, `<img>` and root-relative
-   links resolve; `--expect-selector "#id"` for a section that must exist). Exit 1 = fix it.
+   links resolve, dev/preview noindex vs live indexable; `--expect-selector "#id"` for a section). Exit 1 = fix it.
 8. **Tooling-only change** (AGENTS.md, skills, scripts, CI): prove the site did not change. Build
    before and after, `diff -r` the two `_site` copies: identical, or explain every difference.
 9. **Preview:** commit, `git push -u origin <branch>`, `gh pr create --fill`, then

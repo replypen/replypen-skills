@@ -24,6 +24,9 @@ kickstart), apply all of it before the first preview.
 
 ## Site level (new site, or when touched)
 
+- **Indexed only where it is live:** a dev address (`*.workers.dev`, before the domain move) and every branch
+  preview carry `noindex`, so search and AI engines never pick up a half-built copy; `main` on the own domain
+  carries none, since from go-live being found is the point. `check_page.py` checks both on every page it fetches.
 - **Crawlable:** `robots.txt` does not block GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Bingbot or
   Googlebot; a sitemap exists; pages render their text server-side (no JS-only content); every page 200.
 - **Structured data** (JSON-LD in `<head>`): `Organization` or `LocalBusiness` on the homepage with only

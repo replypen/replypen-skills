@@ -3,8 +3,9 @@
 
 A diff proves what you changed; it proves nothing about the page a human will open. This fetches the
 preview URL and checks the failures that actually happen: a page that 404s, an `<img>` pointing at a
-URL that does not exist, an internal link into nowhere, a section that silently did not render, and
-(for KampAdmin sites) a booking embed that stays a loading spinner because jQuery loads too late.
+URL that does not exist, an internal link into nowhere, a section that silently did not render, a page
+indexed in the wrong place (a dev/preview address search engines may index, or a live page that hides
+from them), and (for KampAdmin sites) a booking embed that stays a loading spinner because jQuery loads too late.
 
     python /skills/website/scripts/check_page.py https://preview.example/kampen/koken/ \\
         --expect-selector "#inschrijven" --expect-selector ".facts" --embed kampadmin
@@ -36,23 +37,26 @@ MAX_LINKS = 30  # per page, per kind: a check that walks a whole site is a crawl
 MAX_WORKERS = 8
 JQUERY_HINTS = ("jquery",)
 EMBED_SCRIPT = "ka-embedv4"
+DEV_HOST_SUFFIXES = (".workers.dev", ".pages.dev")  # previews + a site before its domain move
+LOCAL_HOSTS = ("localhost", "127.0.0.1", "0.0.0.0")
 
 
 # --- fetching --------------------------------------------------------------------------------
 
 
 def fetch(url: str, method: str = "GET") -> dict:
-    """{'status', 'body', 'error'} — never raises. `body` is text only for GET on HTML."""
+    """{'status', 'body', 'headers', 'error'} — never raises. `body` is text only for GET on HTML."""
     request = Request(url, method=method, headers={"User-Agent": USER_AGENT})
     try:
         with urlopen(request, timeout=TIMEOUT) as response:  # noqa: S310 - http(s) only, see below
             raw = response.read(2_000_000) if method == "GET" else b""
             charset = response.headers.get_content_charset() or "utf-8"
-            return {"status": response.status, "body": raw.decode(charset, "replace"), "error": None}
+            return {"status": response.status, "body": raw.decode(charset, "replace"),
+                    "headers": dict(response.headers), "error": None}
     except HTTPError as exc:
-        return {"status": exc.code, "body": "", "error": None}
+        return {"status": exc.code, "body": "", "headers": {}, "error": None}
     except (URLError, OSError, ValueError) as exc:
-        return {"status": 0, "body": "", "error": str(getattr(exc, "reason", exc))}
+        return {"status": 0, "body": "", "headers": {}, "error": str(getattr(exc, "reason", exc))}
 
 
 def probe(url: str) -> dict:
@@ -84,6 +88,7 @@ class _Page(HTMLParser):
         self.scripts: list[dict] = []
         self.theme_urls: list[str] = []
         self.ids: list[str] = []
+        self.robots: list[str] = []
 
     def handle_starttag(self, tag, attrs):
         adict = {k: (v or "") for k, v in attrs}
@@ -92,6 +97,8 @@ class _Page(HTMLParser):
             self.ids.append(adict["id"])
         if adict.get("data-theme-url"):
             self.theme_urls.append(adict["data-theme-url"])
+        if tag == "meta" and adict.get("name", "").lower() in ("robots", "googlebot"):
+            self.robots.append(adict.get("content", "").lower())
         if tag == "img" and adict.get("src"):
             self.images.append(adict["src"])
         elif tag == "a" and adict.get("href"):
@@ -169,7 +176,23 @@ def check_embed(page: _Page) -> list[dict]:
     return out
 
 
-def check_page(url: str, expect_selectors=(), embed: str = "") -> dict:
+def check_indexing(url: str, page: _Page, headers: dict, allow_noindex: bool) -> list[dict]:
+    """Dev and preview addresses must stay out of search engines; the live site must be findable."""
+    host = (urlparse(url).hostname or "").lower()
+    if host in LOCAL_HOSTS:
+        return []
+    header = next((v for k, v in headers.items() if k.lower() == "x-robots-tag"), "").lower()
+    noindex = any("noindex" in c for c in page.robots) or "noindex" in header
+    if host.endswith(DEV_HOST_SUFFIXES):
+        return [{"name": "index: dev/preview-adres is noindex", "ok": noindex,
+                 "detail": "ok" if noindex else f"{host} mag geïndexeerd worden: zoekmachines kunnen deze kopie vinden"}]
+    return [{"name": "index: live pagina is indexeerbaar", "ok": not noindex or allow_noindex,
+             "detail": "ok" if not noindex else
+             ("noindex, toegestaan met --allow-noindex" if allow_noindex else
+              "noindex op de live site: zoekmachines en AI-antwoorden slaan deze pagina over")}]
+
+
+def check_page(url: str, expect_selectors=(), embed: str = "", allow_noindex: bool = False) -> dict:
     checks: list[dict] = []
     response = fetch(url)
     checks.append({"name": f"GET {url}", "ok": response["status"] == 200,
@@ -205,6 +228,8 @@ def check_page(url: str, expect_selectors=(), embed: str = "") -> dict:
         found = matches(selector, page.elements)
         checks.append({"name": f"selector {selector}", "ok": found >= 1, "detail": f"{found}×"})
 
+    checks.extend(check_indexing(url, page, response["headers"], allow_noindex))
+
     if embed == "kampadmin":
         checks.extend(check_embed(page))
 
@@ -238,10 +263,12 @@ def main(argv=None) -> int:
                         help="#id, .class, tag (or tag.class) that must appear at least once. Repeatable.")
     parser.add_argument("--embed", choices=["kampadmin"], default="",
                         help="Also check the booking embed wiring on every page.")
+    parser.add_argument("--allow-noindex", action="store_true",
+                        help="A live page that is noindex on purpose (thank-you page, 404).")
     parser.add_argument("--json", action="store_true", help="Structured payload instead of text.")
     args = parser.parse_args(argv)
 
-    results = [check_page(url, args.expect_selector, args.embed) for url in args.urls]
+    results = [check_page(url, args.expect_selector, args.embed, args.allow_noindex) for url in args.urls]
     print(json.dumps({"pages": results, "ok": all(r["ok"] for r in results)}, indent=2, ensure_ascii=False)
           if args.json else render(results))
     return 0 if all(r["ok"] for r in results) else 1
