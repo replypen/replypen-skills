@@ -21,12 +21,15 @@ over this file. Event contract and privacy: ReplyPen `features/search-events.md`
    `git fetch origin && git worktree add -b help-search-tuneup-$(date +%F) ../<repo>-wt-tuneup origin/<base>`.
    **Since** = date in the newest remote `help-search-tuneup-*` branch (`git ls-remote --heads origin 'help-search-tuneup-*'`), else 30 days ago.
 2. **Data:** `rp project search report --project <p> --from <since> -o json > /tmp/<p>-search.json`
-   (per query: searches, zero results, no-click, shown list, clicks by rank; queries arrive redacted).
+   (per query: searches, zero results, no-click, shown list, clicks by rank, 👍/👎 on the articles it led to;
+   `articles` = vote totals per article; queries arrive redacted).
    Fewer than ~5 searches since → skip steps 3–4 for this site and say so; still do step 5.
 3. **Replay on today's build:** `bash build.sh`, then
    `node .agents/skills/help-search-tuneup/scripts/replay.mjs --ranker <ranker> --index <built index> --report /tmp/<p>-search.json`.
    Judge today's result, not what the visitor saw (`rev`/`v` show which build they had).
-4. **Read before judging:** for every `zero`, `clicked-low`, `check` row open the articles, then label it:
+4. **Read before judging:** for every `zero`, `clicked-low`, `voted-down`, `check` row open the articles, then label
+   it. A 👎 on a query→article pair = that article does not answer that query (wrong top hit, or an article gap);
+   a 👍 pair = a fixture row worth adding. A 👎 without a search is an article-quality signal for the owner:
    - *vocabulary gap* → synonym: common list if generic SaaS wording, else the site list;
    - *article gap* → `searchTerms: [...]` in that article's front matter (words visitors use, the article doesn't);
      a title/heading that is plainly unclear → wording change (visible: owner's OK);

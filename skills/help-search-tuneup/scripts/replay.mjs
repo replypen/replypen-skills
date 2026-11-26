@@ -3,9 +3,9 @@
 //
 //   node replay.mjs --ranker <ranker.js> --index <built search index .json> --report <rp search report -o json file>
 //
-// Prints one line per query and a summary: how many queries failed then (zero results, no click, or a click at
-// rank 3+) and how many still look wrong today. "check" = needs a human/agent read: it had results but nobody
-// opened one, so only the articles can say whether today's top hit answers it. Dependency-free; Node 18+.
+// Prints one line per query and a summary: how many queries failed then (zero results, no click, a click at rank 3+,
+// or a 👎 on the article it led to) and how many still look wrong today. "check" = needs a human/agent read: it had
+// results but nobody opened one, so only the articles can say whether today's top hit answers it. Node 18+.
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -24,21 +24,24 @@ let failedThen = 0, failingNow = 0, check = 0;
 for (const q of report.queries || []) {
   if (!q.q) continue;
   const lowClick = (q.clicks || []).some((c) => Object.keys(c.ranks || {}).some((r) => Number(r) >= 3));
-  const then = q.zero_results > 0 || q.no_click > 0 || lowClick;
+  const then = q.zero_results > 0 || q.no_click > 0 || lowClick || (q.votes || []).some((v) => v.down > 0);
   if (then) failedThen++;
   const { total, results } = ranker.search(q.q);
   const top = results.map((r) => r.doc.id);
   const opened = (q.clicks || [])[0]?.id; // most-clicked article
   const openedNow = opened ? top.indexOf(opened) + 1 : 0;
+  const down = (q.votes || []).filter((v) => v.down > v.up).map((v) => v.id);
   let status = 'ok';
   if (!total) status = 'zero';
+  else if (down.includes(top[0])) status = 'voted-down'; // today's top hit is an article visitors rated 👎 for this query
   else if (opened && ids.has(opened) && (openedNow === 0 || openedNow > 2)) status = 'clicked-low';
   else if (opened && !ids.has(opened)) status = 'gone'; // the opened article left the index (deleted/unlisted)
   else if (!opened && then) status = 'check';
-  if (status === 'zero' || status === 'clicked-low') failingNow++;
+  if (status === 'zero' || status === 'clicked-low' || status === 'voted-down') failingNow++;
   if (status === 'check') check++;
-  const was = [q.zero_results && `zero×${q.zero_results}`, q.no_click && `noclick×${q.no_click}`, lowClick && 'click@3+'].filter(Boolean).join(' ') || '-';
+  const was = [q.zero_results && `zero×${q.zero_results}`, q.no_click && `noclick×${q.no_click}`, lowClick && 'click@3+', ...(q.votes || []).filter((v) => v.down).map((v) => `👎${v.id}`)].filter(Boolean).join(' ') || '-';
   console.log(`${status.padEnd(11)} ${String(q.searches).padStart(3)}× ${q.q.slice(0, 40).padEnd(40)} then: ${was.padEnd(22)} now: ${top.slice(0, 3).join(', ') || '(none)'}${opened ? `  opened: ${opened}${openedNow ? ' #' + openedNow : ''}` : ''}`);
 }
 const n = (report.queries || []).length;
-console.log(`\n${n} queries, ${report.searches} searches. Failed then: ${failedThen}. Still failing today: ${failingNow} (zero or opened article not top 2), plus ${check} to read (results, no click).`);
+for (const a of (report.articles || []).filter((x) => x.down > 0)) console.log(`article 👎×${a.down} 👍×${a.up} ${a.id} (${a.from_search} from a search)`);
+console.log(`\n${n} queries, ${report.searches} searches. Failed then: ${failedThen}. Still failing today: ${failingNow} (zero, opened article not top 2, or a 👎 article on top), plus ${check} to read (results, no click).`);
