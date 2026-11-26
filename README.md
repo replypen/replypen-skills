@@ -26,8 +26,9 @@ The `rp` CLI (`rc` is an alias): `brew install --cask replypen/tap/rp` (macOS) o
 | --- | --- |
 | [replypen-core](skills/replypen-core/SKILL.md) | you got a run link / escalation ticket, need a narrow production read, or must route a finding |
 | [website-dev](skills/website-dev/SKILL.md) | you change a ReplyPen-edited website repo: local build, look, link check, branch preview |
+| [help-search-tuneup](skills/help-search-tuneup/SKILL.md) | weekly: improve a help center's browser search from the visitor searches ReplyPen logs |
 
-A website repo also commits a root `.replypenignore` with `/.agents/skills/website-dev/` and
+A website repo also commits a root `.replypenignore` with `/.agents/skills/website-dev/`, `/.agents/skills/help-search-tuneup/` and
 `/skills-lock.json`: the ReplyPen chat agent editing that site cannot build or push, so the loop would only confuse it.
 
 Brain authoring (the agent's own knowledge repo) is documented in
