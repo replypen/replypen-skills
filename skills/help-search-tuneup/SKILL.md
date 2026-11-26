@@ -55,9 +55,12 @@ over this file. Event contract and privacy: ReplyPen `features/search-events.md`
 
 ## Ship
 
-One branch + PR per site, body = what was learned in plain words and the fixture numbers before/after. Say which
-kind each change is: synonyms, `searchTerms`, fixture rows and ranker tuning change no visible copy;
-title/heading/article wording does and always waits for the site owner. Follow the site repo's merge rules.
+One branch + PR per site, body = what was learned in plain words and the fixture numbers before/after.
+- **Data-only** (synonyms, `searchTerms`, fixture rows, ranker tuning: no visible copy) → merge it yourself once
+  the gate/CI is green, then verify live: twin ranker served and `cmp`-identical across both sites, one query that
+  only works through the new data, search events still leaving for ReplyPen.
+- **Visible wording** (title, heading, article text) → its own PR, left open for the site owner (named in the
+  site's `AGENTS.md`); never bundled with a data-only PR.
 
 ## Report (to whoever started the run)
 
