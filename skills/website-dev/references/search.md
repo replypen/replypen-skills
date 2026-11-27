@@ -21,9 +21,10 @@ Pick the smallest level that does the job.
 - Use a stop-word list in the site's language.
 - Typos may only match words that appear in the index, so an off-topic query returns nothing.
 
-**Fixture in the build:** keep a JSON file of `{q, expect}` pairs, and let `build.sh` fail when a known query loses
-its result. Every fix adds its query. Live API data changes, so test it in a separate script (network), not in
-the build.
+**Fixture in the build:** keep `{q, expect}` pairs and let `build.sh` fail when a known query loses its result.
+Every fix adds its query. For live API data, commit a frozen copy of the API response, serve it from a fake `fetch`
+(same paging as the real API) and pin "today" to the copy's date, so the build needs no network and never fails
+because camps ended; a separate script runs the same checks against the live API.
 
 ## 2 · Tuned from real searches (help centers, big sites)
 
@@ -45,7 +46,9 @@ Use the same local search, plus three things:
   click boost: with a few hundred searches a month, clicks are mostly noise and position bias.
 
 Worth it from about 100 searches a month on one site. A camp site with a small offering stays on level 1; for camp
-sites, the best match for level 2 is a shared synonym list across all of a company's sites.
+sites, the best match for level 2 is a shared synonym list across all of a company's sites. Even on level 1, a
+small directional word list (`pony → paard`) in one data file, read by every search box on the site, is cheap:
+keep it short and movable (it may later move onto the item itself as front matter).
 
 Reference implementations:
 

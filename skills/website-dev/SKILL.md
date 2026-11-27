@@ -28,7 +28,8 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 2. **Tools:** Node comes from `mise.toml` (`mise install`). No `pnpm` on PATH? Prefix every command with
    `mise exec pnpm@10 --` (e.g. `mise exec pnpm@10 -- bash build.sh`). Then `pnpm install`.
 3. **Edit** the smallest change that does the ask. A site-wide behaviour (links, images, scripts): owner and
-   mechanism in [references/site-behaviour.md](references/site-behaviour.md) (build time before runtime JS).
+   mechanism in [references/site-behaviour.md](references/site-behaviour.md) (build time before runtime JS; data
+   from an API: build-time snapshot or runtime fetch; a nav dropdown without a framework).
    A map with pins plus a place search box (Mapbox: account, public token, Geocoding v6 settings):
    [references/mapbox.md](references/mapbox.md). A search box (local index, or tuned from logged searches):
    [references/search.md](references/search.md).
