@@ -19,12 +19,11 @@ live example: [site-demo-jeugdwerk](https://site-demo-jeugdwerk.kampadmin-sites.
 `.txt` keeps Eleventy from building the skill copy in a consumer's `.agents/` as pages; such a site should also
 `eleventyConfig.ignores.add(".agents/**")` and `".claude/**"`.
 
-
 | File | Role |
 |---|---|
-| `_data/cookies.yml` | The only place: `gtm_id`, `consent_mode`, `policy_url`, `categories`, `scripts`, `cookies`, banner texts. Comments in it say how to add a tool. |
-| `_includes/consent.html` | In `<head>`. Renders nothing while `categories` holds only `necessary` (dormant). Else: JSON config block, vendored lib, `assets/consent.js`, and each `scripts` entry as `<script type="text/plain" data-category data-src>` that the lib runs after consent. |
-| `assets/consent.js` (+ a few `#cc-main { --cc-btn-primary-bg: … }` lines in the site CSS for house colours) | Google Consent Mode v2 default (all denied) → `CookieConsent.run` → on every choice: `gtag('consent','update')`, GTM load (basic mode: only after analytics or marketing consent), `window.kaConsent` + `ka:consent` event for our own scripts (KampAdmin embed). |
+| `_data/cookies.yml` | The only place: `gtm_id`, `consent_mode`, `policy_url`, `cookie_domain` (share the choice with subdomains), `revision`, `categories`, `scripts`, `cookies`, banner texts. Comments in it say how to add a tool. |
+| `_includes/consent.html` | In `<head>`. Renders nothing while `categories` holds only `necessary` (dormant). Else: the config as JSON in `<meta name="consent-config">` (HTML-escaped, so no text can break it), vendored lib, `assets/consent.js`, and each `scripts` entry as `<script type="text/plain" data-category data-src>` that the lib runs after consent. |
+| `assets/consent.js` (+ a few `#cc-main { --cc-btn-primary-bg: … }` lines in the site CSS for house colours) | Google Consent Mode v2 default (all denied) → `CookieConsent.run` → on every choice: `gtag('consent','update')`, dataLayer event `consent_update` (trigger for non-Google tags), GTM load (basic mode: only after analytics or marketing consent), `window.kaConsent` + `ka:consent` event for our own scripts (KampAdmin embed). Withdrawing a category reloads the page (a running tag can't be stopped). |
 | `assets/vendor/cookieconsent-<version>/` | Unmodified `dist/cookieconsent.umd.js`, `.css`, `LICENSE` from `https://registry.npmjs.org/vanilla-cookieconsent/-/vanilla-cookieconsent-<version>.tgz` (3.3.0 tested). Upgrade = new folder + the two paths in `consent.html`. |
 | `_includes/cookie-table.html`, `cookies.html` (set `permalink` to the site's URL style) | `/cookies`: one table per category from the same yml, so banner and policy can't drift. |
 | footer (add by hand) | Link to `/cookies`; when active also `<button data-cc="show-preferencesModal">Cookie-instellingen</button>` (reopens the choice). |
@@ -37,11 +36,18 @@ The includes read `cookies` (template: every `_data/*.yml` is global) or `site.d
 1. List their tools (GTM container contents, pixels, chat). Each gets a category, its cookies and its domains.
 2. `categories`: add `analytics` and/or `marketing` (fixed ids: they map to Consent Mode `analytics_storage` /
    `ad_storage, ad_user_data, ad_personalization`; `preferences` → functionality/personalization).
-3. `gtm_id` or `scripts` entries; cookie rows (name ending in `*` = prefix, also auto-cleared on reject).
-4. CSP in `_headers`: GTM needs `script-src https://www.googletagmanager.com` plus whatever its tags load
-   (`connect-src`/`img-src` for GA: `*.google-analytics.com`, `*.analytics.google.com`).
-5. Tags inside their GTM container must respect Consent Mode (Google tags do; others: the customer's or agency's job,
-   say so in the offer). `consent_mode: advanced` (GTM loads before the choice, cookieless pings) only on request.
+3. `gtm_id` or `scripts` entries; cookie rows (name ending in `*` = prefix, also auto-cleared on reject; add
+   `domain`/`path` when the vendor sets them, else the clear misses). Only cookies are cleared: a tool's
+   localStorage stays until its own cleanup; list it anyway.
+4. CSP in `_headers`: per installed tag, from [Google's CSP guide](https://developers.google.com/tag-platform/security/guides/csp)
+   (GTM alone already needs `www.googletagmanager.com` in `script-src`, `img-src` and `connect-src`). After consent,
+   the console must show no CSP errors.
+5. GTM loads once any of analytics/marketing is granted, so the container runs with the other category denied.
+   Every tag needs a consent setting in GTM: Google tags their built-in checks (in basic mode also "Require
+   additional consent" for the storage they use, else they send cookieless pings); non-Google tags "Require
+   additional consent" + fire on the `consent_update` event, not on All Pages. The container is the customer's or
+   agency's job: say so in the offer. `consent_mode: advanced` (GTM before the choice) only on request.
+6. A tool added later to a category people already accepted: bump `revision`, so everyone chooses again.
 
 ## Check (browser, fresh profile)
 
@@ -49,7 +55,7 @@ The includes read `cookies` (template: every `_data/*.yml` is global) or `site.d
   (network tab), `dataLayer[0]` = consent default denied.
 - "Enkel noodzakelijke" → only `cc_cookie`; reload: no banner, still nothing loaded.
 - Footer "Cookie-instellingen" → modal; "Alles aanvaarden" → the gated script loads, its cookie appears,
-  `dataLayer` has `consent update … granted`. Reject again → its `*` cookies are gone.
+  `dataLayer` has `consent update … granted`. Reject again → page reloads, its `*` cookies are gone.
 - Accept and reject buttons look equal (same weight is a GBA expectation). 390 px: banner fits, table scrolls.
 - Headless browsers: the lib hides the banner from bots (`navigator.webdriver`); use a real browser profile.
 
