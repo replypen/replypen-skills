@@ -27,7 +27,8 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
    preview hostname, so lowercase letters, digits and dashes only, short (`openingsuren-zomer`).
 2. **Tools:** Node comes from `mise.toml` (`mise install`). No `pnpm` on PATH? Prefix every command with
    `mise exec pnpm@10 --` (e.g. `mise exec pnpm@10 -- bash build.sh`). Then `pnpm install`.
-3. **Edit** the smallest change that does the ask.
+3. **Edit** the smallest change that does the ask. A site-wide behaviour (links, images, scripts): owner and
+   mechanism in [references/site-behaviour.md](references/site-behaviour.md) (build time before runtime JS).
 4. **Build = the CI gate:** `bash build.sh`, the exact command the `Website build` job runs (site tests
    and contract checks run inside it). It must pass before you push.
 5. **Serve like Cloudflare:** `pnpm dlx wrangler@4 dev --port 8787` serves `_site` with the real
