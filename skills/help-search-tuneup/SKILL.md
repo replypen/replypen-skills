@@ -1,10 +1,10 @@
 ---
 name: help-search-tuneup
 description: >-
-  Weekly tune-up of a static help center's browser search from real visitor searches that ReplyPen logs:
+  Monthly tune-up of a static help center's browser search from real visitor searches that ReplyPen logs:
   fetch the per-query report with rp, replay it on today's index, label each miss, fix it as data a build
-  can test (synonyms, per-article searchTerms, query fixture) or one ranker idea, generalize, open one PR per
-  site. Use for "tune help search", the weekly help-search job, or a zero-result/low-click query review.
+  can test (per-article searchTerms, shared synonyms, query fixture) or one ranker idea, generalize, open one PR per
+  site. Use for "tune help search", the monthly help-search job, or a zero-result/low-click query review.
 ---
 
 # help-search-tuneup
@@ -12,8 +12,11 @@ description: >-
 Edit in [replypen/replypen-skills](https://github.com/replypen/replypen-skills) only: installed copies are overwritten on update.
 
 Learning is editorial, never an automatic click boost. The site's root `AGENTS.md` names its paths (ranker and
-its **twin** in the sibling site, common + site synonym lists, query fixture, built index, `rp` project); it wins
+its **twin** in the sibling site, the common synonym list, query fixture, built index, `rp` project); it wins
 over this file. Event contract and privacy: ReplyPen `features/search-events.md`.
+
+**Cadence:** monthly, over the previous calendar month. Fewer than ~20 searches on both sites together → one line
+("skipped: N searches") and stop; the next run starts from the last tune-up branch date, so nothing is lost.
 
 ## Run (each site, then the cross-site pass)
 
@@ -23,16 +26,19 @@ over this file. Event contract and privacy: ReplyPen `features/search-events.md`
 2. **Data:** `rp project search report --project <p> --from <since> -o json > /tmp/<p>-search.json`
    (per query: searches, zero results, no-click, shown list, clicks by rank, 👍/👎 on the articles it led to;
    `articles` = vote totals per article; queries arrive redacted).
-   Fewer than ~5 searches since → skip steps 3–4 for this site and say so; still do step 5.
+   One site with fewer than ~5 searches since → skip steps 3–4 for that site and say so; still do step 5.
 3. **Replay on today's build:** `bash build.sh`, then
    `node .agents/skills/help-search-tuneup/scripts/replay.mjs --ranker <ranker> --index <built index> --report /tmp/<p>-search.json`.
    Judge today's result, not what the visitor saw (`rev`/`v` show which build they had).
 4. **Read before judging:** for every `zero`, `clicked-low`, `voted-down`, `check` row open the articles, then label
    it. A 👎 on a query→article pair = that article does not answer that query (wrong top hit, or an article gap);
    a 👍 pair = a fixture row worth adding. A 👎 without a search is an article-quality signal for the owner:
-   - *vocabulary gap* → synonym: common list if generic SaaS wording, else the site list;
-   - *article gap* → `searchTerms: [...]` in that article's front matter (words visitors use, the article doesn't);
+   - *article gap* (the default) → `searchTerms: [...]` in that article's front matter: the words visitors use
+     that point at this article and that the article doesn't use ("coupon" on the promotion-code article);
      a title/heading that is plainly unclear → wording change (visible: owner's OK);
+   - *vocabulary gap* → a rule in the common synonym list (the only list), only when it holds wherever the word
+     appears: abbreviation (`mfa` → `2fa`), spelling (`licence`), split word (`dropdown` → `drop down`), generic
+     SaaS wording (`receipt` → `invoice`). A rule that would only ever find one article is an article gap;
    - *missing article* → write nothing; list it for the owner with the queries that asked;
    - *ranker flaw* (right words present, wrong order; a rule misfires) → the twin ranker, at most one idea per run;
    - *noise* (test rows, off-topic, gibberish) → nothing, or a must-find-nothing fixture row.
@@ -51,6 +57,8 @@ over this file. Event contract and privacy: ReplyPen `features/search-events.md`
 - Synonym keys go through the ranker's stop words: a key that is mostly stop words ("get back" → "back") rewrites
   every query containing the rest. Replay the whole fixture after each synonym.
 - Exact matches keep ranking above synonym matches; no edit lowers a fixture score.
+- Every synonym rule keeps a fixture query that needs it (drop the rule → that query fails); a rule that changes
+  no result on either site is deleted.
 - ≤ ~20 data edits per site per run; a ranker change brings before/after fixture numbers for both sites and bumps
   `VERSION`.
 - No names or personal data in fixtures or `searchTerms`; keep the intent ("restore a colleague's workspace").
@@ -68,4 +76,4 @@ One branch + PR per site, body = what was learned in plain words and the fixture
 ## Report (to whoever started the run)
 
 Searches seen per site; share of queries failing then vs on today's replay; what changed; what generalized;
-missing articles for the owner; one line on what would make next week's run easier.
+missing articles for the owner; one line on what would make next month's run easier.

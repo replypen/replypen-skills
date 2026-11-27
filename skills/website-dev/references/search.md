@@ -30,10 +30,11 @@ because camps ended; a separate script runs the same checks against the live API
 
 Use the same local search, plus three things:
 
-- **Vocabulary as data:**
-  - a directional synonym list (`mfa` also finds `2fa`, not the reverse);
-  - front matter `searchTerms: [...]` on an article for the words visitors use that the article doesn't (indexed,
-    never shown).
+- **Vocabulary as data, on the article first:**
+  - front matter `searchTerms: [...]` on an article for the words visitors use that point at it and that the
+    article doesn't use (indexed, never shown): "coupon" on the promotion-code article;
+  - one shared directional synonym list only for rules that hold wherever the word appears (`mfa` also finds
+    `2fa`, not the reverse; spellings, split words). Each rule keeps a fixture query that needs it.
 - **Events to ReplyPen:**
   - `POST https://app.replypen.com/search-events/{project}` with `navigator.sendBeacon`, as `text/plain`; the
     server always answers 204.
@@ -41,8 +42,8 @@ Use the same local search, plus three things:
     `feedback` 👍/👎 under an article. Result links carry `#hs=<sid>`, so the vote joins the search it came from.
   - The browser sends no cookie and no visitor id, and only from the production host; ReplyPen redacts the
     queries.
-- **Weekly editorial tune-up:** [help-search-tuneup](../../help-search-tuneup/SKILL.md) replays the logged queries
-  on today's index and fixes misses as data (a synonym, `searchTerms`, a fixture row). It never adds an automatic
+- **Monthly editorial tune-up:** [help-search-tuneup](../../help-search-tuneup/SKILL.md) replays the logged queries
+  on today's index and fixes misses as data (`searchTerms`, a shared synonym, a fixture row). It never adds an automatic
   click boost: with a few hundred searches a month, clicks are mostly noise and position bias.
 
 Worth it from about 100 searches a month on one site. A camp site with a small offering stays on level 1; for camp
