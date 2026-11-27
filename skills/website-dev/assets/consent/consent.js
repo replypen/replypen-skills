@@ -1,8 +1,8 @@
 // Cookie consent on vanilla-cookieconsent (assets/vendor/cookieconsent-*), driven by _data/cookies.yml.
 // Loaded only when that file lists a category besides "necessary" (_includes/consent.html).
-// Recipe: website-dev references/consent.md. Config comes from a JSON block: the CSP forbids inline scripts.
+// Recipe: website-dev references/consent.md. Config: JSON in <meta name="consent-config"> (the CSP forbids inline scripts).
 (() => {
-  const cfg = JSON.parse(document.getElementById("consent-config").textContent);
+  const cfg = JSON.parse(document.querySelector('meta[name="consent-config"]').content);
   const ids = cfg.categories.map((c) => c.id);
 
   // Google Consent Mode v2: everything denied until the visitor chooses; set before any Google tag loads.
@@ -35,13 +35,19 @@
     // Signal for our own scripts (e.g. the KampAdmin embed): which categories the visitor accepted.
     window.kaConsent = Object.fromEntries(ids.map((id) => [id, ok(id)]));
     document.dispatchEvent(new CustomEvent("ka:consent", { detail: window.kaConsent }));
+    window.dataLayer.push({ event: "consent_update", consent: window.kaConsent }); // GTM trigger for non-Google tags
     if (ok("analytics") || ok("marketing")) loadGtm();
   };
 
   // "_ga*" in cookies.yml → clear cookies starting with "_ga" when the category is rejected.
+  // Withdrawing consent reloads the page: a tag that already runs can't be stopped or keep recreating its cookies.
   const autoClear = (cat) => ({
-    cookies: cfg.cookies.filter((c) => c.category === cat).map((c) =>
-      ({ name: c.name.endsWith("*") ? new RegExp(`^${c.name.slice(0, -1).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`) : c.name })),
+    reloadPage: true,
+    cookies: cfg.cookies.filter((c) => c.category === cat).map((c) => ({
+      name: c.name.endsWith("*") ? new RegExp(`^${c.name.slice(0, -1).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`) : c.name,
+      ...(c.domain && { domain: c.domain }), // the vendor's own cookie scope, when not this host
+      ...(c.path && { path: c.path }),
+    })),
   });
   const categories = Object.fromEntries(cfg.categories.map((c) =>
     [c.id, c.id === "necessary" ? { enabled: true, readOnly: true } : { autoClear: autoClear(c.id) }]));
@@ -65,6 +71,8 @@
 
   CookieConsent.run({
     categories,
+    revision: cfg.revision, // bump in cookies.yml when a new tool joins a category: everyone chooses again
+    ...(cfg.cookie_domain && { cookie: { domain: cfg.cookie_domain } }), // e.g. ".example.com": www and app share one choice
     onConsent: apply,
     onChange: apply,
     guiOptions: { consentModal: { layout: "box", position: "bottom left" }, preferencesModal: { layout: "box" } },

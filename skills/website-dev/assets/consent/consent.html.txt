@@ -4,7 +4,14 @@
   then the banner loads and scripts from `scripts` wait for their category. Recipe: website-dev references/consent.md.
 {%- endcomment -%}
 {%- if ck.categories.size > 1 %}
-  <script id="consent-config" type="application/json">{"gtm_id": {{ ck.gtm_id | default: "" | jsonify }}, "consent_mode": {{ ck.consent_mode | default: "basic" | jsonify }}, "policy_url": {{ ck.policy_url | default: "/cookies" | jsonify }}, "categories": {{ ck.categories | jsonify | replace: "</", "<\/" }}, "cookies": {{ ck.cookies | jsonify | replace: "</", "<\/" }}, "banner": {{ ck.banner | jsonify | replace: "</", "<\/" }}}</script>
+  {%- capture cfg -%}
+  {"gtm_id": {{ ck.gtm_id | default: "" | jsonify }}, "consent_mode": {{ ck.consent_mode | default: "basic" | jsonify }},
+   "policy_url": {{ ck.policy_url | default: "/cookies" | jsonify }}, "cookie_domain": {{ ck.cookie_domain | default: "" | jsonify }},
+   "revision": {{ ck.revision | default: 0 | jsonify }}, "categories": {{ ck.categories | jsonify }},
+   "cookies": {{ ck.cookies | jsonify | default: "[]" }}, "banner": {{ ck.banner | jsonify | default: "{}" }}}
+  {%- endcapture %}
+  {%- comment -%} An attribute, not a JSON <script>: `escape` makes any text safe there, and the CSP blocks inline scripts anyway. {%- endcomment %}
+  <meta name="consent-config" content="{{ cfg | escape }}">
   <link rel="stylesheet" href="/assets/vendor/cookieconsent-3.3.0/cookieconsent.css">
   <script src="/assets/vendor/cookieconsent-3.3.0/cookieconsent.umd.js" defer></script>
   <script src="/assets/consent.js" defer></script>

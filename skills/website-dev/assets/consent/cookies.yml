@@ -18,6 +18,12 @@ consent_mode: basic
 # De cookiepagina (link in banner en voet).
 policy_url: /cookies
 
+# Keuze delen met subdomeinen (bv. ".voorbeeld.be" voor www + app); leeg = enkel dit domein.
+cookie_domain: ""
+
+# Verhoog met 1 als er een tool bijkomt in een categorie waarvoor bezoekers al toestemming gaven: iedereen kiest opnieuw.
+revision: 0
+
 # Categorieën in de banner, in deze volgorde. id: necessary | preferences | analytics | marketing
 # (vaste namen: ze bepalen Google Consent Mode). "necessary" staat altijd aan en kan niet uit.
 categories:
@@ -38,6 +44,7 @@ scripts: []
 
 # Alle opslag die de site of haar tools gebruiken. Een naam die eindigt op * = alle cookies die zo beginnen
 # (wordt ook gewist als de bezoeker die categorie weigert). duration: hoe lang het bewaard blijft.
+# Optioneel domain/path: zoals de tool zijn cookie zet (bv. domain: ".voorbeeld.be"), anders wist weigeren hem niet.
 cookies:
   - name: "cc_cookie"
     provider: "Deze site"
