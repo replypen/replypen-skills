@@ -30,7 +30,8 @@ it wins. ReplyPen's chat agent reads only that `AGENTS.md`; it cannot build, you
 3. **Edit** the smallest change that does the ask. A site-wide behaviour (links, images, scripts): owner and
    mechanism in [references/site-behaviour.md](references/site-behaviour.md) (build time before runtime JS).
    A map with pins plus a place search box (Mapbox: account, public token, Geocoding v6 settings):
-   [references/mapbox.md](references/mapbox.md).
+   [references/mapbox.md](references/mapbox.md). A search box (local index, or tuned from logged searches):
+   [references/search.md](references/search.md).
 4. **Build = the CI gate:** `bash build.sh`, the exact command the `Website build` job runs (site tests
    and contract checks run inside it). It must pass before you push.
 5. **Serve like Cloudflare:** `pnpm dlx wrangler@4 dev --port 8787` serves `_site` with the real
