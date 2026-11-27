@@ -21,12 +21,15 @@ live example: [site-demo-jeugdwerk](https://site-demo-jeugdwerk.kampadmin-sites.
 
 | File | Role |
 |---|---|
-| `_data/cookies.yml` | The only place: `gtm_id`, `consent_mode`, `policy_url`, `cookie_domain` (share the choice with subdomains), `revision`, `categories`, `scripts`, `cookies`, banner texts. Comments in it say how to add a tool. |
+| `_data/cookies.yml` | The only place: `gtm_id`, `consent_mode`, `policy_url`, `cookie_domain` (share the choice with subdomains), `revision`, `categories`, `scripts`, `cookies`, banner texts (Dutch by default; `banner.lang`, `close`, `table_headers` for another language). Comments in it say how to add a tool. |
 | `_includes/consent.html` | In `<head>`. Renders nothing while `categories` holds only `necessary` (dormant). Else: the config as JSON in `<meta name="consent-config">` (HTML-escaped, so no text can break it), vendored lib, `assets/consent.js`, and each `scripts` entry as `<script type="text/plain" data-category data-src>` that the lib runs after consent. |
 | `assets/consent.js` (+ a few `#cc-main { --cc-btn-primary-bg: … }` lines in the site CSS for house colours) | Google Consent Mode v2 default (all denied) → `CookieConsent.run` → on every choice: `gtag('consent','update')`, dataLayer event `consent_update` (trigger for non-Google tags), GTM load (basic mode: only after analytics or marketing consent), `window.kaConsent` + `ka:consent` event for our own scripts (KampAdmin embed). Withdrawing a category reloads the page (a running tag can't be stopped). |
 | `assets/vendor/cookieconsent-<version>/` | Unmodified `dist/cookieconsent.umd.js`, `.css`, `LICENSE` from `https://registry.npmjs.org/vanilla-cookieconsent/-/vanilla-cookieconsent-<version>.tgz` (3.3.0 tested). Upgrade = new folder + the two paths in `consent.html`. |
 | `_includes/cookie-table.html`, `cookies.html` (set `permalink` to the site's URL style) | `/cookies`: one table per category from the same yml, so banner and policy can't drift. |
 | footer (add by hand) | Link to `/cookies`; when active also `<button data-cc="show-preferencesModal">Cookie-instellingen</button>` (reopens the choice). |
+
+A server-rendered app (Rails, Django, ...): load the same yml, emit the same `<meta name="consent-config">` and mark
+inline tracker snippets `<script type="text/plain" data-category="analytics">`; `consent.js` and the lib stay unchanged.
 
 The includes read `cookies` (template: every `_data/*.yml` is global) or `site.data.cookies` (Jekyll-style sites):
 `{% assign ck = cookies | default: site.data.cookies %}`, so the same files work in both.
