@@ -1,0 +1,26 @@
+---
+layout: default
+permalink: /cookies
+title: Cookies
+description: "Welke cookies en vergelijkbare opslag deze site gebruikt, en waarvoor."
+---
+{%- assign ck = cookies | default: site.data.cookies -%}
+{%- comment -%}
+  Starttekst, geen juridisch advies: de organisatie is verantwoordelijk en past de tekst aan. De tabellen komen uit
+  _data/cookies.yml; voeg daar cookies toe, nooit hier.
+{%- endcomment %}
+<section class="page-head">
+  <div class="wrap narrow">
+    <h1>Cookies</h1>
+    <p>Een cookie is een klein bestand dat een website op je toestel bewaart. Hieronder staat alles wat deze site
+      bewaart (cookies en vergelijkbare opslag in je browser), door wie en hoe lang.
+      {%- if ck.categories.size > 1 %} Cookies die niet noodzakelijk zijn, gebruiken we enkel met jouw toestemming.
+      <button type="button" class="btn btn-ghost" data-cc="show-preferencesModal">Cookie-instellingen</button>
+      {%- else %} De site gebruikt enkel noodzakelijke opslag; daarvoor is geen toestemming nodig.{% endif %}</p>
+  </div>
+</section>
+
+<section class="wrap narrow">
+  {% include "cookie-table.html" %}
+  <p>Vragen? Mail naar <a href="mailto:{{ site.email }}">{{ site.email }}</a>.</p>
+</section>

@@ -1,0 +1,14 @@
+{%- assign ck = cookies | default: site.data.cookies -%}{%- comment -%} template: global `cookies`; Jekyll-style sites: site.data.cookies {%- endcomment -%}
+{%- comment -%}
+  Cookie consent (in <head>). Dormant unless _data/cookies.yml lists a category besides "necessary":
+  then the banner loads and scripts from `scripts` wait for their category. Recipe: website-dev references/consent.md.
+{%- endcomment -%}
+{%- if ck.categories.size > 1 %}
+  <script id="consent-config" type="application/json">{"gtm_id": {{ ck.gtm_id | default: "" | jsonify }}, "consent_mode": {{ ck.consent_mode | default: "basic" | jsonify }}, "policy_url": {{ ck.policy_url | default: "/cookies" | jsonify }}, "categories": {{ ck.categories | jsonify | replace: "</", "<\/" }}, "cookies": {{ ck.cookies | jsonify | replace: "</", "<\/" }}, "banner": {{ ck.banner | jsonify | replace: "</", "<\/" }}}</script>
+  <link rel="stylesheet" href="/assets/vendor/cookieconsent-3.3.0/cookieconsent.css">
+  <script src="/assets/vendor/cookieconsent-3.3.0/cookieconsent.umd.js" defer></script>
+  <script src="/assets/consent.js" defer></script>
+  {%- for s in ck.scripts %}
+  <script type="text/plain" data-category="{{ s.category }}" data-src="{{ s.src }}" defer></script>
+  {%- endfor %}
+{%- endif %}

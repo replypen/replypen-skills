@@ -1,0 +1,63 @@
+# Cookies en vergelijkbare opslag (localStorage, pixels) op deze site: de ENIGE plek.
+# Dit bestand stuurt de cookiepagina (/cookies), de cookiebanner, welke scripts pas na toestemming laden en
+# Google Consent Mode. Recept: .agents/skills/website-dev/references/consent.md.
+#
+# Banner AAN zodra hieronder een categorie naast "necessary" staat (en dus een script of gtm_id dat
+# toestemming vraagt). Enkel noodzakelijke opslag = geen banner (GBA), wel deze lijst op /cookies.
+#
+# Een nieuwe tool (Google Analytics, Meta-pixel, ...) toevoegen:
+#   1. zijn categorie onder `categories` (analytics of marketing), als die er nog niet staat;
+#   2. zijn script onder `scripts` (of de container-id in `gtm_id`) met diezelfde categorie;
+#   3. zijn cookies onder `cookies`; 4. het domein in de CSP (`_headers`, script-src/connect-src/img-src).
+
+# Google Tag Manager-container (GTM-XXXXXXX); leeg = geen GTM. Laadt pas na toestemming voor analytics of
+# marketing (consent_mode: basic). "advanced" laadt GTM meteen, met alles op denied tot de keuze: enkel op vraag.
+gtm_id: ""
+consent_mode: basic
+
+# De cookiepagina (link in banner en voet).
+policy_url: /cookies
+
+# Categorieën in de banner, in deze volgorde. id: necessary | preferences | analytics | marketing
+# (vaste namen: ze bepalen Google Consent Mode). "necessary" staat altijd aan en kan niet uit.
+categories:
+  - id: necessary
+    title: "Noodzakelijk"
+    description: "Nodig om de site te laten werken en te beveiligen. Deze staan altijd aan."
+  # - id: analytics
+  #   title: "Statistieken"
+  #   description: "Tellen anoniem hoe bezoekers de site gebruiken, zodat we ze kunnen verbeteren."
+  # - id: marketing
+  #   title: "Marketing"
+  #   description: "Meten welke advertenties en campagnes werken, en tonen relevante advertenties op andere sites."
+
+# Scripts die pas laden na toestemming voor hun categorie (extern domein: ook in de CSP zetten).
+#   - src: https://example.com/pixel.js
+#     category: marketing
+scripts: []
+
+# Alle opslag die de site of haar tools gebruiken. Een naam die eindigt op * = alle cookies die zo beginnen
+# (wordt ook gewist als de bezoeker die categorie weigert). duration: hoe lang het bewaard blijft.
+cookies:
+  - name: "cc_cookie"
+    provider: "Deze site"
+    purpose: "Onthoudt je cookiekeuze (enkel als de site een cookiebanner toont)."
+    duration: "6 maanden"
+    category: necessary
+  - name: "Cloudflare Turnstile"
+    provider: "Cloudflare"
+    purpose: "Botcheck op het contactformulier (beveiliging). Bewaart niets op dit domein."
+    duration: "Sessie"
+    category: necessary
+
+# Teksten van de banner.
+banner:
+  title: "Cookies op deze site"
+  text: "We gebruiken noodzakelijke cookies om de site te laten werken. Andere cookies gebruiken we enkel met jouw toestemming; via 'Zelf kiezen' zie je welke. Je keuze aanpassen kan altijd onderaan elke pagina."
+  accept_all: "Alles aanvaarden"
+  reject_all: "Enkel noodzakelijke"
+  settings: "Zelf kiezen"
+  save: "Keuze bewaren"
+  settings_title: "Cookie-instellingen"
+  more_info: "Meer uitleg op onze"
+  policy_link: "cookiepagina"

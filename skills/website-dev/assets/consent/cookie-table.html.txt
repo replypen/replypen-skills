@@ -1,0 +1,16 @@
+{%- assign ck = cookies | default: site.data.cookies -%}{%- comment -%} template: global `cookies`; Jekyll-style sites: site.data.cookies {%- endcomment -%}
+{%- comment -%} Cookie list per category for /cookies, from _data/cookies.yml (same source as the banner). {%- endcomment -%}
+{%- for cat in ck.categories %}
+<h2>{{ cat.title }}</h2>
+<p>{{ cat.description }}</p>
+<div class="table-scroll">
+<table class="cookie-table">
+  <thead><tr><th>Naam</th><th>Van</th><th>Doel</th><th>Bewaard</th></tr></thead>
+  <tbody>
+  {%- for c in ck.cookies %}{% if c.category == cat.id %}
+    <tr><td><code>{{ c.name }}</code></td><td>{{ c.provider }}</td><td>{{ c.purpose }}</td><td>{{ c.duration }}</td></tr>
+  {%- endif %}{% endfor %}
+  </tbody>
+</table>
+</div>
+{%- endfor %}
