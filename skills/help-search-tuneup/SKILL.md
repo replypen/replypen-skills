@@ -57,8 +57,8 @@ over this file. Event contract and privacy: ReplyPen `features/search-events.md`
 - Synonym keys go through the ranker's stop words: a key that is mostly stop words ("get back" → "back") rewrites
   every query containing the rest. Replay the whole fixture after each synonym.
 - Exact matches keep ranking above synonym matches; no edit lowers a fixture score.
-- Every synonym rule keeps a fixture query that needs it (drop the rule → that query fails); a rule that changes
-  no result on either site is deleted.
+- A new synonym rule brings the fixture query that needs it (drop the rule → that query fails); a rule that changes
+  no result on either site (its key searched alone returns the same top 3 with and without it) is deleted.
 - ≤ ~20 data edits per site per run; a ranker change brings before/after fixture numbers for both sites and bumps
   `VERSION`.
 - No names or personal data in fixtures or `searchTerms`; keep the intent ("restore a colleague's workspace").
