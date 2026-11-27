@@ -42,6 +42,9 @@ The includes read `cookies` (template: every `_data/*.yml` is global) or `site.d
 4. CSP in `_headers`: per installed tag, from [Google's CSP guide](https://developers.google.com/tag-platform/security/guides/csp)
    (GTM alone already needs `www.googletagmanager.com` in `script-src`, `img-src` and `connect-src`). After consent,
    the console must show no CSP errors.
+   GTM Custom HTML tags and Custom JavaScript variables need `'unsafe-inline'`/`'unsafe-eval'`, which our CSP
+   forbids: the customer's agency converts them to Community Template Gallery templates, or the owner accepts the
+   weaker CSP. Decide this before go-live (found on Heyo: SALESmanago, TikTok).
 5. GTM loads once any of analytics/marketing is granted, so the container runs with the other category denied.
    Every tag needs a consent setting in GTM: Google tags their built-in checks (in basic mode also "Require
    additional consent" for the storage they use, else they send cookieless pings); non-Google tags "Require
@@ -57,6 +60,8 @@ The includes read `cookies` (template: every `_data/*.yml` is global) or `site.d
 - Footer "Cookie-instellingen" → modal; "Alles aanvaarden" → the gated script loads, its cookie appears,
   `dataLayer` has `consent update … granted`. Reject again → page reloads, its `*` cookies are gone.
 - Accept and reject buttons look equal (same weight is a GBA expectation). 390 px: banner fits, table scrolls.
+- Check cookie clearing on the live domain: on a `*.workers.dev` preview, Google cookies such as `_gcl_au` may
+  survive a reject, while on the real domain they are cleared.
 - Headless browsers: the lib hides the banner from bots (`navigator.webdriver`); use a real browser profile.
 
 Pricing and who may switch it on: the company's wrapper skill (e.g. KampAdmin `customer-websites`).
