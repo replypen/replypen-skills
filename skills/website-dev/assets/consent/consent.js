@@ -36,7 +36,7 @@
     window.kaConsent = Object.fromEntries(ids.map((id) => [id, ok(id)]));
     document.dispatchEvent(new CustomEvent("ka:consent", { detail: window.kaConsent }));
     window.dataLayer.push({ event: "consent_update", consent: window.kaConsent }); // GTM trigger for non-Google tags
-    if (ok("analytics") || ok("marketing")) loadGtm();
+    if ((cfg.gtm_categories || ["analytics", "marketing"]).some(ok)) loadGtm(); // a container with ad tags: [marketing]
   };
 
   // "_ga*" in cookies.yml → clear cookies starting with "_ga" when the category is rejected.
@@ -53,6 +53,9 @@
     [c.id, c.id === "necessary" ? { enabled: true, readOnly: true } : { autoClear: autoClear(c.id) }]));
 
   const b = cfg.banner;
+  // Labels the yml may override (English site: lang, close, table_headers); Dutch by default.
+  const lang = b.lang || "nl";
+  const headers = b.table_headers || { name: "Naam", provider: "Van", purpose: "Doel", duration: "Bewaard" };
   const policy = `${b.more_info} <a href="${cfg.policy_url}">${b.policy_link}</a>.`;
   const sections = cfg.categories.map((c) => {
     const rows = cfg.cookies.filter((k) => k.category === c.id);
@@ -62,7 +65,7 @@
       linkedCategory: c.id,
       ...(rows.length && {
         cookieTable: {
-          headers: { name: "Naam", provider: "Van", purpose: "Doel", duration: "Bewaard" },
+          headers,
           body: rows.map(({ name, provider, purpose, duration }) => ({ name, provider, purpose, duration })),
         },
       }),
@@ -77,9 +80,9 @@
     onChange: apply,
     guiOptions: { consentModal: { layout: "box", position: "bottom left" }, preferencesModal: { layout: "box" } },
     language: {
-      default: "nl",
+      default: lang,
       translations: {
-        nl: {
+        [lang]: {
           consentModal: {
             title: b.title,
             description: `${b.text} ${policy}`,
@@ -92,7 +95,7 @@
             acceptAllBtn: b.accept_all,
             acceptNecessaryBtn: b.reject_all,
             savePreferencesBtn: b.save,
-            closeIconLabel: "Sluiten",
+            closeIconLabel: b.close || "Sluiten",
             sections: [{ description: policy }, ...sections],
           },
         },

@@ -68,3 +68,7 @@ banner:
   settings_title: "Cookie-instellingen"
   more_info: "Meer uitleg op onze"
   policy_link: "cookiepagina"
+  # Optioneel, voor een anderstalige site (standaard Nederlands):
+  # lang: en
+  # close: "Close"
+  # table_headers: { name: "Name", provider: "From", purpose: "Purpose", duration: "Kept" }
