@@ -45,7 +45,7 @@ The includes read `cookies` (template: every `_data/*.yml` is global) or `site.d
 4. CSP in `_headers`: per installed tag, from [Google's CSP guide](https://developers.google.com/tag-platform/security/guides/csp)
    (GTM alone already needs `www.googletagmanager.com` in `script-src`, `img-src` and `connect-src`). After consent,
    the console must show no CSP errors.
-5. GTM loads once any of analytics/marketing is granted, so the container runs with the other category denied.
+5. GTM loads once any of analytics/marketing is granted (`gtm_categories` in the yml narrows that, e.g. `[marketing]` for a container whose ad tags lack "Require additional consent"), so the container runs with the other category denied.
    Every tag needs a consent setting in GTM: Google tags their built-in checks (in basic mode also "Require
    additional consent" for the storage they use, else they send cookieless pings); non-Google tags "Require
    additional consent" + fire on the `consent_update` event, not on All Pages. The container is the customer's or

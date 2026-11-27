@@ -36,7 +36,7 @@
     window.kaConsent = Object.fromEntries(ids.map((id) => [id, ok(id)]));
     document.dispatchEvent(new CustomEvent("ka:consent", { detail: window.kaConsent }));
     window.dataLayer.push({ event: "consent_update", consent: window.kaConsent }); // GTM trigger for non-Google tags
-    if (ok("analytics") || ok("marketing")) loadGtm();
+    if ((cfg.gtm_categories || ["analytics", "marketing"]).some(ok)) loadGtm(); // a container with ad tags: [marketing]
   };
 
   // "_ga*" in cookies.yml → clear cookies starting with "_ga" when the category is rejected.
