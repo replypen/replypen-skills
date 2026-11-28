@@ -36,6 +36,28 @@ kickstart), apply all of it before the first preview.
 - **Off-site (ask the owner):** a claimed Google Business profile and directory listings with the same
   address, hours and phone as the site.
 
+## What a measured rebuild taught (do these on a new site)
+
+- **Homepage title = topic + place + name** ("Orthodontist in Heverlee (Leuven) · Ortho Heverlee"), never the
+  name alone: the homepage is what ranks for "<trade> <town>". **One description per page**: many CMSes repeat
+  a site-wide one, which counts as none.
+- **Business JSON-LD, complete:** `@id` (`<url>/#org`), `address`, `telephone`, `image`, `logo`, `hasMap`,
+  `geo` (from an open geocoder whose results you may store, e.g. Geopunt in Flanders), `sameAs` = the Google
+  Business profile URL; `openingHoursSpecification` only from real hours (not "by appointment").
+- **JSON-LD built from visible markup at build time** (an Eleventy transform or a Jekyll include): an FAQ list
+  of `<details><summary>` → `FAQPage`; team cards → `Person` with `jobTitle` + `worksFor: {"@id": …}`. It can
+  never say more than the page, and an edit to the page updates it. Named people matter: AI assistants
+  otherwise merge or split them (a practitioner shown as a separate business at another address).
+- **Photos are the speed budget:** WebP in two widths (800 + 1600) with `srcset`/`sizes`, and `<link
+  rel="preload" as="image" fetchpriority="high">` for the hero, above all a CSS `background-image` (the browser
+  finds it late). Measured: largest image on a phone 7.3 s → 1.8 s, 2.5 MB → 0.4 MB.
+- **"Allowed" is not "served":** a CDN's AI-bot blocking (e.g. Cloudflare "Block AI bots") is invisible in
+  `robots.txt`. Fetch the homepage with a GPTBot / ClaudeBot / PerplexityBot user agent and expect 200.
+- **Measure, don't guess:** before/after with [findability-score](https://github.com/replypen/replypen-skills/tree/main/skills/findability-score) (`pnpm dlx skills add replypen/replypen-skills -s findability-score -y`); ask
+  ChatGPT/Perplexity the 3 questions a customer would and read what they get wrong. A wrong fact there is
+  fixed at its source (directory listing, Google profile), not on the site. AI answers quote the Google
+  star rating verbatim: more reviews is often the biggest lever left after the site.
+
 ## Never
 
 - Keyword stuffing, hidden text, meta keywords, `llms.txt` or other "AI files" as a visibility trick.
